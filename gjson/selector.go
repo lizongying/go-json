@@ -3,7 +3,6 @@ package gjson
 import (
 	"errors"
 	"github.com/tidwall/gjson"
-	"regexp"
 )
 
 type Selector struct {
@@ -25,8 +24,22 @@ func (s *Selector) Many(path string) (results []*Result) {
 	}
 	return
 }
-func (s *Selector) ManyString(str string) []string {
-	return regexp.MustCompile(str).FindAllString(s.str, -1)
+
+func (s *Selector) OneSelector(path string) *Selector {
+	s.str = gjson.Get(s.str, path).Raw
+	return s
+}
+
+func (s *Selector) ManySelector(path string) (selectors []*Selector) {
+	json := gjson.Get(s.str, path)
+	if json.IsArray() {
+		for _, i := range json.Array() {
+			selectors = append(selectors, &Selector{str: i.Raw})
+		}
+	} else {
+		selectors = append(selectors, &Selector{str: json.Raw})
+	}
+	return
 }
 
 // NewSelectorFromBytes selector from bytes

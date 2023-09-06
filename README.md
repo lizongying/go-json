@@ -29,16 +29,16 @@ func main() {
 	s, _ := gjson.NewSelectorFromStr(html)
 
 	i := s.One(`age`).Int()
-	//123
+	//47
 	fmt.Printf("%+v\n", i)
 
 	u64 := s.One(`age`).Int64()
-	//123
+	//47
 	fmt.Printf("%+v\n", u64)
 
 	m := s.Many(`a`)
 	n := m[0].Float64()
-	//abc
+	//2
 	fmt.Println(n)
 }
 
