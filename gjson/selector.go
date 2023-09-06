@@ -10,6 +10,10 @@ type Selector struct {
 }
 
 func (s *Selector) One(path string) *Result {
+	json := gjson.Get(s.str, path)
+	if json.Str != "" {
+		return NewResult(gjson.Get(s.str, path).Str)
+	}
 	return NewResult(gjson.Get(s.str, path).Raw)
 }
 
@@ -17,16 +21,29 @@ func (s *Selector) Many(path string) (results []*Result) {
 	json := gjson.Get(s.str, path)
 	if json.IsArray() {
 		for _, i := range json.Array() {
-			results = append(results, NewResult(i.Raw))
+			if i.Str != "" {
+				results = append(results, NewResult(i.Str))
+			} else {
+				results = append(results, NewResult(i.Raw))
+			}
 		}
 	} else {
-		results = append(results, NewResult(json.Raw))
+		if json.Str != "" {
+			results = append(results, NewResult(json.Str))
+		} else {
+			results = append(results, NewResult(json.Raw))
+		}
 	}
 	return
 }
 
 func (s *Selector) OneSelector(path string) *Selector {
-	s.str = gjson.Get(s.str, path).Raw
+	json := gjson.Get(s.str, path)
+	if json.Str != "" {
+		s.str = gjson.Get(s.str, path).Str
+	} else {
+		s.str = gjson.Get(s.str, path).Raw
+	}
 	return s
 }
 
@@ -34,10 +51,18 @@ func (s *Selector) ManySelector(path string) (selectors []*Selector) {
 	json := gjson.Get(s.str, path)
 	if json.IsArray() {
 		for _, i := range json.Array() {
-			selectors = append(selectors, &Selector{str: i.Raw})
+			if i.Str != "" {
+				selectors = append(selectors, &Selector{str: i.Str})
+			} else {
+				selectors = append(selectors, &Selector{str: i.Raw})
+			}
 		}
 	} else {
-		selectors = append(selectors, &Selector{str: json.Raw})
+		if json.Str != "" {
+			selectors = append(selectors, &Selector{str: json.Str})
+		} else {
+			selectors = append(selectors, &Selector{str: json.Raw})
+		}
 	}
 	return
 }

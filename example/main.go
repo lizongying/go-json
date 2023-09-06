@@ -22,7 +22,7 @@ func main() {
 	//2
 	fmt.Println(n)
 
-	a := s.OneNode(`name`)
+	a := s.OneSelector(`name`)
 	b := a.One("first")
-	fmt.Println(a, b)
+	fmt.Println(b)
 }
